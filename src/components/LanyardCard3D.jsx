@@ -7,6 +7,7 @@ import { personalData } from '../data/portfolioData';
  * - 4K Ultra-Sharp Quality Card Texture (2048x2900 with anisotropic filtering)
  * - Realistic Lanyard: Woven grosgrain fabric texture with MeshStandardMaterial lighting,
  *   physical fabric catenary sag & wave inertia, metallic swivel clasp & crimp assembly
+ * - Slower, majestic opening fall animation from the top of the screen (~2.4s graceful descent)
  * - Continuous slow floating animation: card gently sways, bobs, and breathes in 3D space even when not stretched
  * - Darker forest green lanyard with no text, top anchor positioned 10 units offscreen
  * - Hint pill badge positioned at the RIGHT side of the 3D card
@@ -59,7 +60,7 @@ export default function LanyardCard3D({ className = "w-full h-full" }) {
     let restX = getRestX();
     const restY = 0.45;
 
-    // Lights - Carefully balanced for realistic fabric and card specular highlights
+    // Lights
     const ambientLight = new THREE.AmbientLight(0xffffff, 2.0);
     scene.add(ambientLight);
 
@@ -95,18 +96,15 @@ export default function LanyardCard3D({ className = "w-full h-full" }) {
     img.src = personalData.photoPath;
 
     const renderFrontCanvas = () => {
-      // Dark sleek card surface
       ctxF.fillStyle = '#06080d';
       ctxF.fillRect(0, 0, 2048, 2900);
 
-      // Card outer border (curved corners) - Primary Green Accent
       ctxF.strokeStyle = 'rgba(34, 197, 94, 0.8)';
       ctxF.lineWidth = 36;
       ctxF.beginPath();
       ctxF.roundRect(48, 48, 1952, 2804, 120);
       ctxF.stroke();
 
-      // Top slot hole for lanyard attachment
       ctxF.fillStyle = '#000000';
       ctxF.beginPath();
       ctxF.roundRect(844, 76, 360, 72, 36);
@@ -115,7 +113,6 @@ export default function LanyardCard3D({ className = "w-full h-full" }) {
       ctxF.lineWidth = 8;
       ctxF.stroke();
 
-      // Top Badge Tag (Green Primary)
       ctxF.fillStyle = 'rgba(34, 197, 94, 0.15)';
       ctxF.beginPath();
       ctxF.roundRect(440, 190, 1168, 116, 58);
@@ -129,7 +126,6 @@ export default function LanyardCard3D({ className = "w-full h-full" }) {
       ctxF.textAlign = 'center';
       ctxF.fillText('OFFICIAL CREDENTIAL • DENTAL BILLING', 1024, 268);
 
-      // Photo Frame
       const photoX = 424;
       const photoY = 350;
       const photoSize = 1200;
@@ -142,7 +138,6 @@ export default function LanyardCard3D({ className = "w-full h-full" }) {
       ctxF.lineWidth = 10;
       ctxF.stroke();
 
-      // Draw photo in high-definition
       if (img.complete && img.naturalWidth !== 0) {
         ctxF.save();
         ctxF.beginPath();
@@ -152,7 +147,6 @@ export default function LanyardCard3D({ className = "w-full h-full" }) {
         ctxF.restore();
       }
 
-      // Location Pill overlay on Photo
       ctxF.fillStyle = 'rgba(0, 0, 0, 0.92)';
       ctxF.beginPath();
       ctxF.roundRect(624, 1410, 800, 108, 54);
@@ -166,13 +160,11 @@ export default function LanyardCard3D({ className = "w-full h-full" }) {
       ctxF.textAlign = 'center';
       ctxF.fillText('Davao City, PH', 1024, 1482);
 
-      // Name: Hussein Hassan (Razor sharp 4K)
       ctxF.fillStyle = '#ffffff';
       ctxF.font = 'bold 156px "Geist Mono", sans-serif';
       ctxF.textAlign = 'center';
       ctxF.fillText('Hussein Hassan', 1024, 1770);
 
-      // Role titles (Green Accent)
       ctxF.fillStyle = '#22c55e';
       ctxF.font = 'bold 64px "Geist Mono", monospace';
       ctxF.fillText('DENTAL BILLING SPECIALIST', 1024, 1890);
@@ -180,7 +172,6 @@ export default function LanyardCard3D({ className = "w-full h-full" }) {
       ctxF.fillStyle = '#86efac';
       ctxF.fillText('& HEALTHCARE VIRTUAL ASSISTANT', 1024, 1976);
 
-      // Divider Line
       ctxF.strokeStyle = 'rgba(255, 255, 255, 0.15)';
       ctxF.lineWidth = 6;
       ctxF.beginPath();
@@ -188,8 +179,6 @@ export default function LanyardCard3D({ className = "w-full h-full" }) {
       ctxF.lineTo(1908, 2070);
       ctxF.stroke();
 
-      // Bottom Info Boxes
-      // Box 1: FULL NAME
       ctxF.fillStyle = 'rgba(255, 255, 255, 0.05)';
       ctxF.beginPath();
       ctxF.roundRect(140, 2140, 840, 540, 56);
@@ -208,7 +197,6 @@ export default function LanyardCard3D({ className = "w-full h-full" }) {
       ctxF.fillText('Abdul Hussein', 220, 2410);
       ctxF.fillText('P. Hassan', 220, 2510);
 
-      // Box 2: STATUS
       ctxF.fillStyle = 'rgba(255, 255, 255, 0.05)';
       ctxF.beginPath();
       ctxF.roundRect(1068, 2140, 840, 540, 56);
@@ -222,7 +210,6 @@ export default function LanyardCard3D({ className = "w-full h-full" }) {
       ctxF.textAlign = 'left';
       ctxF.fillText('STATUS', 1148, 2270);
 
-      // Status indicator green dot
       ctxF.fillStyle = '#22c55e';
       ctxF.beginPath();
       ctxF.arc(1180, 2430, 28, 0, Math.PI * 2);
@@ -236,7 +223,6 @@ export default function LanyardCard3D({ className = "w-full h-full" }) {
       ctxF.font = '44px "Geist Mono", monospace';
       ctxF.fillText('Ready for US Practice', 1148, 2560);
 
-      // Footer accent bar
       ctxF.fillStyle = '#22c55e';
       ctxF.fillRect(140, 2750, 1768, 20);
 
@@ -265,14 +251,12 @@ export default function LanyardCard3D({ className = "w-full h-full" }) {
       ctxB.fillStyle = '#06080d';
       ctxB.fillRect(0, 0, 2048, 2900);
 
-      // Curved outer border
       ctxB.strokeStyle = 'rgba(34, 197, 94, 0.8)';
       ctxB.lineWidth = 36;
       ctxB.beginPath();
       ctxB.roundRect(48, 48, 1952, 2804, 120);
       ctxB.stroke();
 
-      // Top slot hole
       ctxB.fillStyle = '#000000';
       ctxB.beginPath();
       ctxB.roundRect(844, 76, 360, 72, 36);
@@ -281,18 +265,15 @@ export default function LanyardCard3D({ className = "w-full h-full" }) {
       ctxB.lineWidth = 8;
       ctxB.stroke();
 
-      // Magnetic Stripe
       ctxB.fillStyle = '#111420';
       ctxB.fillRect(48, 240, 1952, 340);
 
-      // Signature bar
       ctxB.fillStyle = '#e2e8f0';
       ctxB.fillRect(140, 680, 1240, 190);
       ctxB.fillStyle = '#0f172a';
       ctxB.font = 'italic bold 72px "Geist Mono", cursive';
       ctxB.fillText('Hussein Hassan (Authorized)', 180, 810);
 
-      // HIPAA Seal Badge (Green)
       ctxB.fillStyle = 'rgba(34, 197, 94, 0.15)';
       ctxB.beginPath();
       ctxB.roundRect(1440, 680, 460, 190, 40);
@@ -307,7 +288,6 @@ export default function LanyardCard3D({ className = "w-full h-full" }) {
       ctxB.fillText('HIPAA', 1670, 770);
       ctxB.fillText('COMPLIANT', 1670, 830);
 
-      // Practice info
       ctxB.fillStyle = '#ffffff';
       ctxB.font = 'bold 84px "Geist Mono", monospace';
       ctxB.fillText('FAIRTRADE OUTSOURCING', 1024, 1060);
@@ -322,7 +302,6 @@ export default function LanyardCard3D({ className = "w-full h-full" }) {
       ctxB.fillText('Email: vinzhassan0114@gmail.com', 1024, 1400);
       ctxB.fillText('Phone: +63 916 462 1284', 1024, 1490);
 
-      // Barcode
       ctxB.fillStyle = '#ffffff';
       const barcodeY = 1680;
       const barcodeH = 300;
@@ -425,20 +404,17 @@ export default function LanyardCard3D({ className = "w-full h-full" }) {
       roughness: 0.15
     });
 
-    // 1. Horizontal clip bar passing through the card's slot hole
     const slotClipGeo = new THREE.CylinderGeometry(0.04, 0.04, 0.22, 16);
     const slotClipMesh = new THREE.Mesh(slotClipGeo, metalMat);
     slotClipMesh.rotation.z = Math.PI / 2;
     slotClipMesh.position.set(0, cardH / 2 - 0.09, 0.01);
     cardGroup.add(slotClipMesh);
 
-    // 2. Vertical connector loop / swivel ring
     const ringGeo = new THREE.TorusGeometry(0.08, 0.022, 12, 24);
     const ringMesh = new THREE.Mesh(ringGeo, metalMat);
     ringMesh.position.set(0, cardH / 2 + 0.03, 0.01);
     cardGroup.add(ringMesh);
 
-    // 3. Metallic crimp clasp holding the bottom of the fabric ribbon
     const crimpGeo = new THREE.BoxGeometry(0.38, 0.12, 0.07);
     const crimpMesh = new THREE.Mesh(crimpGeo, metalMat);
     crimpMesh.position.set(0, cardH / 2 + 0.14, 0.01);
@@ -452,13 +428,10 @@ export default function LanyardCard3D({ className = "w-full h-full" }) {
     lanyardCanvas.height = 1024;
     const lCtx = lanyardCanvas.getContext('2d');
 
-    // Base deep dark forest green
     lCtx.fillStyle = '#011508';
     lCtx.fillRect(0, 0, 256, 1024);
 
-    // Procedural woven grosgrain fabric texture (alternating ribbed fabric weave lines)
     for (let y = 0; y < 1024; y += 4) {
-      // Alternating fine fabric grain
       if ((y / 4) % 2 === 0) {
         lCtx.fillStyle = '#021e0b';
       } else {
@@ -466,7 +439,6 @@ export default function LanyardCard3D({ className = "w-full h-full" }) {
       }
       lCtx.fillRect(12, y, 232, 4);
 
-      // Micro weave grain dots
       lCtx.fillStyle = '#032a10';
       for (let x = 16; x < 240; x += 12) {
         if ((x + y) % 8 === 0) {
@@ -475,12 +447,10 @@ export default function LanyardCard3D({ className = "w-full h-full" }) {
       }
     }
 
-    // Outer fabric reinforced stitched borders
     lCtx.strokeStyle = '#053d19';
     lCtx.lineWidth = 10;
     lCtx.strokeRect(6, 0, 244, 1024);
 
-    // Inner subtle stitch dashed line
     lCtx.strokeStyle = '#084f22';
     lCtx.lineWidth = 3;
     lCtx.setLineDash([8, 8]);
@@ -492,7 +462,6 @@ export default function LanyardCard3D({ className = "w-full h-full" }) {
     lanyardTexture.wrapT = THREE.RepeatWrapping;
     lanyardTexture.repeat.set(1, 6);
 
-    // MeshStandardMaterial gives the fabric authentic light diffusion and soft specular luster!
     const lanyardMaterial = new THREE.MeshStandardMaterial({
       map: lanyardTexture,
       roughness: 0.68,
@@ -506,18 +475,14 @@ export default function LanyardCard3D({ className = "w-full h-full" }) {
     const strapMesh = new THREE.Mesh(strapGeo, lanyardMaterial);
     scene.add(strapMesh);
 
-    // Invisible Hit Box Plane for the Lanyard to make dragging effortless
     const hitBoxGeo = new THREE.PlaneGeometry(0.85, 1, 1, strapSegments);
     const hitBoxMat = new THREE.MeshBasicMaterial({ visible: false, side: THREE.DoubleSide });
     const lanyardHitMesh = new THREE.Mesh(hitBoxGeo, hitBoxMat);
     scene.add(lanyardHitMesh);
 
-    // CRITICAL: Anchor 10 units ABOVE visible top so lanyard end is NEVER seen when stretching
     let topAnchor = new THREE.Vector3(restX, getVisibleTop() + 10.0, 0);
 
-    // Update lanyard attachment with physical fabric catenary sag & wave inertia
     const updateLanyardAttachment = (time) => {
-      // Connect to top of crimp clasp
       const cardSlotLocal = new THREE.Vector3(0, cardH / 2 + 0.18, 0.01);
       const cardSlotWorld = cardSlotLocal.clone();
       cardGroup.localToWorld(cardSlotWorld);
@@ -530,17 +495,13 @@ export default function LanyardCard3D({ className = "w-full h-full" }) {
       const totalRows = strapSegments + 1;
 
       const camPos = camera.position;
-
-      // Distance between card and anchor to compute realistic fabric slack
       const dist = cardSlotWorld.distanceTo(topAnchor);
 
       for (let j = 0; j < totalRows; j++) {
-        const t = j / strapSegments; // 0 = card, 1 = anchor
+        const t = j / strapSegments;
 
-        // Arc factor: 0 at ends, 1 in the middle
         const arc = Math.sin(t * Math.PI);
 
-        // Physical fabric wave & natural gravity catenary curve
         const waveX = Math.sin(t * Math.PI * 2.0 + time * 1.4) * 0.02 * arc;
         const waveZ = Math.cos(t * Math.PI * 1.5 + time * 1.1) * 0.025 * arc;
         const sagZ = arc * Math.max(0, 0.06 * (1 - dist / 14.0));
@@ -565,7 +526,6 @@ export default function LanyardCard3D({ className = "w-full h-full" }) {
         pos.setXYZ(idxL, curX - side.x * halfW, curY - side.y * halfW, curZ - side.z * halfW);
         pos.setXYZ(idxR, curX + side.x * halfW, curY + side.y * halfW, curZ + side.z * halfW);
 
-        // Hit box
         const hitHalfW = 0.45;
         hitPos.setXYZ(idxL, curX - side.x * hitHalfW, curY - side.y * hitHalfW, curZ - side.z * hitHalfW);
         hitPos.setXYZ(idxR, curX + side.x * hitHalfW, curY + side.y * hitHalfW, curZ + side.z * hitHalfW);
@@ -586,12 +546,17 @@ export default function LanyardCard3D({ className = "w-full h-full" }) {
     };
 
     // ==========================================
-    // 6. OPEN ANIMATION, CONTINUOUS SLOW FLOATING & PHYSICS
+    // 6. SLOWER OPEN ANIMATION (Fall from top of screen) & PHYSICS
     // ==========================================
-    let cardPos = { x: restX, y: getVisibleTop() + 8.0, z: 0 }; // Starts high above screen
-    let cardVelocity = { x: 0, y: -0.22, z: 0 }; // Fast downward plunge on initial load
-    let cardRotation = { x: 0.15, y: 0.2, z: 0 };
+    // CRITICAL USER INSTRUCTION: "make the open animation(fall from the top screen) of the 3D card slower."
+    // Starts high above screen:
+    let cardPos = { x: restX, y: getVisibleTop() + 6.5, z: 0 };
+    let cardVelocity = { x: 0, y: 0, z: 0 };
+    let cardRotation = { x: 0.12, y: 0.18, z: 0 };
     let rotVelocity = { x: 0, y: 0, z: 0 };
+
+    let openPhaseElapsed = 0;
+    const openPhaseDuration = 2.4; // 2.4 seconds of deliberate, slow descent from top
 
     let isDragging = false;
     let dragPlane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
@@ -615,7 +580,6 @@ export default function LanyardCard3D({ className = "w-full h-full" }) {
       mouseNDC.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
       raycaster.setFromCamera(mouseNDC, camera);
 
-      // Detect hit on Card OR Lanyard Strap
       const intersects = raycaster.intersectObjects([
         cardMeshFront, 
         cardMeshBack, 
@@ -660,7 +624,6 @@ export default function LanyardCard3D({ className = "w-full h-full" }) {
     window.addEventListener('mousemove', onPointerMove);
     window.addEventListener('mouseup', onPointerUp);
 
-    // Touch support
     const onTouchStart = (e) => {
       if (e.touches.length === 1) onPointerDown(e.touches[0]);
     };
@@ -673,7 +636,6 @@ export default function LanyardCard3D({ className = "w-full h-full" }) {
     window.addEventListener('touchmove', onTouchMove, { passive: true });
     window.addEventListener('touchend', onTouchEnd);
 
-    // Resize handler
     const onResize = () => {
       if (!container) return;
       width = container.clientWidth || window.innerWidth;
@@ -688,7 +650,7 @@ export default function LanyardCard3D({ className = "w-full h-full" }) {
     window.addEventListener('resize', onResize);
 
     // ==========================================
-    // 7. ANIMATION LOOP (Slow Idle Motion + Auto-Face Front)
+    // 7. ANIMATION LOOP (Slower Opening Drop + Slow Idle Motion)
     // ==========================================
     let animId;
     let clock = new THREE.Clock();
@@ -698,22 +660,30 @@ export default function LanyardCard3D({ className = "w-full h-full" }) {
       const time = clock.getElapsedTime();
 
       if (!isDragging) {
-        // CRITICAL USER INSTRUCTION: "the 3D card must be moving slowly for animation even when not stretched."
-        // Slow, natural organic floating & pendulum sway in 3D space:
-        const idleBobY = Math.sin(time * 1.3) * 0.045;   // Gentle slow floating bob up & down
-        const idleSwayX = Math.sin(time * 0.85) * 0.038; // Gentle subtle horizontal sway
-        const idleYaw = Math.sin(time * 1.05) * 0.075;   // Slow gentle yaw turning left/right (~4.3 degrees)
-        const idlePitch = Math.cos(time * 1.25) * 0.045; // Subtle slow nod up/down (~2.5 degrees)
-        const idleRoll = Math.sin(time * 0.85) * 0.03;   // Subtle pendulum roll tilt
+        // Continuous organic 3D idle floating & pendulum sway:
+        const idleBobY = Math.sin(time * 1.3) * 0.045;
+        const idleSwayX = Math.sin(time * 0.85) * 0.038;
+        const idleYaw = Math.sin(time * 1.05) * 0.075;
+        const idlePitch = Math.cos(time * 1.25) * 0.045;
+        const idleRoll = Math.sin(time * 0.85) * 0.03;
 
         const targetX = restX + idleSwayX;
         const targetY = restY + idleBobY;
 
-        const springK = 0.042;
-        const damping = 0.88;
+        // Controlled spring physics with deliberate descent speed during open animation
+        const springK = 0.038;
+        const damping = 0.90;
 
         const forceX = (targetX - cardPos.x) * springK;
-        const forceY = (targetY - cardPos.y) * springK;
+        let forceY = (targetY - cardPos.y) * springK;
+
+        // Slower open animation: cap the downward speed during the opening descent
+        if (openPhaseElapsed < openPhaseDuration) {
+          openPhaseElapsed += 0.016;
+          // Smoothly descends at a slow, stately terminal speed (-0.052 units per frame)
+          forceY = Math.max(forceY, -0.06);
+          cardVelocity.y = Math.max(cardVelocity.y, -0.052);
+        }
 
         cardVelocity.x = (cardVelocity.x + forceX) * damping;
         cardVelocity.y = (cardVelocity.y + forceY) * damping;
@@ -721,7 +691,7 @@ export default function LanyardCard3D({ className = "w-full h-full" }) {
         cardPos.x += cardVelocity.x;
         cardPos.y += cardVelocity.y;
 
-        // Auto-face front while gracefully blending in slow idle 3D breathing rotation
+        // Auto-face front while gracefully blending slow idle 3D rotation
         cardRotation.y += (idleYaw - cardRotation.y) * 0.08;
         cardRotation.x += (idlePitch - cardRotation.x) * 0.08;
 
@@ -732,11 +702,9 @@ export default function LanyardCard3D({ className = "w-full h-full" }) {
         rotVelocity.x *= 0.82;
       }
 
-      // Update card group transform
       cardGroup.position.set(cardPos.x, cardPos.y, cardPos.z);
       cardGroup.rotation.set(cardRotation.x, cardRotation.y, cardRotation.z);
 
-      // Update lanyard connection with time for realistic cloth ripples
       updateLanyardAttachment(time);
 
       renderer.render(scene, camera);
