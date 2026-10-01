@@ -29,13 +29,12 @@ export default function Experience() {
     <section 
       id="experience" 
       ref={sectionRef}
-      className="relative py-20 sm:py-28 bg-black text-white overflow-hidden border-t border-white/[0.08] font-mono"
+      className="relative py-24 sm:py-32 bg-black text-white overflow-hidden border-t border-white/[0.08] font-mono"
     >
-      {/* Smaller, compact editorial container */}
-      <div className="relative z-10 max-w-4xl mx-auto px-6 sm:px-8">
+      <div className="relative z-10 max-w-6xl mx-auto px-6 sm:px-8">
         
-        {/* Arlen Carter Header: [02] in GREEN */}
-        <div className={`flex flex-col sm:flex-row sm:items-baseline justify-between gap-4 mb-10 border-b border-white/10 pb-5 transition-all duration-700 ${
+        {/* Arlen Carter Header: [02] in GREEN - matched width and spacing to About & Contact */}
+        <div className={`flex flex-col sm:flex-row sm:items-baseline justify-between gap-4 mb-14 border-b border-white/10 pb-6 transition-all duration-700 ${
           inView ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'
         }`}>
           <div className="flex items-baseline gap-3">
@@ -50,14 +49,15 @@ export default function Experience() {
           </span>
         </div>
 
-        {/* Smaller, Compact Experience Box with Smooth Fade-In Animation */}
-        <div 
-          className={`border border-white/10 p-5 sm:p-7 bg-white/[0.01] hover:bg-white/[0.02] rounded-lg transition-all duration-800 ease-out ${
-            inView 
-              ? 'opacity-100 scale-100 translate-y-0' 
-              : 'opacity-0 scale-[0.96] translate-y-8 pointer-events-none'
-          }`}
-        >
+        {/* Compact Experience Box Centered */}
+        <div className="max-w-4xl mx-auto">
+          <div 
+            className={`border border-white/10 p-5 sm:p-7 bg-white/[0.01] hover:bg-white/[0.02] rounded-lg transition-all duration-800 ease-out ${
+              inView 
+                ? 'opacity-100 scale-100 translate-y-0' 
+                : 'opacity-0 scale-[0.96] translate-y-8 pointer-events-none'
+            }`}
+          >
           
           {/* Top Line Meta */}
           <div className="flex flex-col md:flex-row md:items-baseline justify-between gap-3 pb-4 border-b border-white/10">
@@ -115,6 +115,7 @@ export default function Experience() {
             ))}
           </div>
 
+          </div>
         </div>
 
       </div>

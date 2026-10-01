@@ -61,15 +61,10 @@ function Skill3DBox({ skill, index, inView }) {
           </span>
         </div>
 
-        {/* Skill Title */}
-        <h3 className="text-xs sm:text-[13px] font-bold text-white tracking-tight uppercase mb-1.5 group-hover:text-green-400 transition-colors line-clamp-1">
+        {/* Full Skill Title - Whole title displayed, no truncation */}
+        <h3 className="text-xs sm:text-[13px] font-bold text-white tracking-tight uppercase leading-snug mb-3 group-hover:text-green-400 transition-colors">
           {skill.title}
         </h3>
-
-        {/* Short Description */}
-        <p className="text-[11px] text-gray-400 leading-snug mb-2.5 line-clamp-2">
-          {skill.description}
-        </p>
       </div>
 
       {/* Bottom Mastery & Tags */}
@@ -130,12 +125,12 @@ export default function Skills() {
     <section 
       id="skills" 
       ref={sectionRef}
-      className="relative py-20 sm:py-28 bg-black text-white overflow-hidden border-t border-white/[0.08] font-mono"
+      className="relative py-24 sm:py-32 bg-black text-white overflow-hidden border-t border-white/[0.08] font-mono"
     >
-      <div className="relative z-10 max-w-5xl mx-auto px-6 sm:px-8">
+      <div className="relative z-10 max-w-6xl mx-auto px-6 sm:px-8">
         
-        {/* Arlen Carter Header: [03] in GREEN */}
-        <div className={`flex flex-col sm:flex-row sm:items-baseline justify-between gap-4 mb-10 border-b border-white/10 pb-5 transition-all duration-700 ${
+        {/* Arlen Carter Header: [03] in GREEN - matched width and spacing to About & Contact */}
+        <div className={`flex flex-col sm:flex-row sm:items-baseline justify-between gap-4 mb-14 border-b border-white/10 pb-6 transition-all duration-700 ${
           inView ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'
         }`}>
           <div className="flex items-baseline gap-3">

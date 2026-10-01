@@ -28,12 +28,12 @@ export default function Certifications() {
     <section 
       id="certification" 
       ref={sectionRef}
-      className="relative py-20 sm:py-28 bg-black text-white overflow-hidden border-t border-white/[0.08] font-mono"
+      className="relative py-24 sm:py-32 bg-black text-white overflow-hidden border-t border-white/[0.08] font-mono"
     >
-      <div className="relative z-10 max-w-5xl mx-auto px-6 sm:px-8">
+      <div className="relative z-10 max-w-6xl mx-auto px-6 sm:px-8">
         
-        {/* Header: Title as big as About page (text-2xl sm:text-3xl) */}
-        <div className={`flex flex-col sm:flex-row sm:items-baseline justify-between gap-4 mb-10 border-b border-white/10 pb-5 transition-all duration-700 ${
+        {/* Header: matched width and spacing to About & Contact */}
+        <div className={`flex flex-col sm:flex-row sm:items-baseline justify-between gap-4 mb-14 border-b border-white/10 pb-6 transition-all duration-700 ${
           inView ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'
         }`}>
           <div className="flex items-baseline gap-3">
