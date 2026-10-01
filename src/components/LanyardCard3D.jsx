@@ -5,13 +5,12 @@ import { personalData } from '../data/portfolioData';
 /**
  * LanyardCard3D
  * - 4K Ultra-Sharp Quality Card Texture (2048x2900 with anisotropic filtering)
- * - Scaled down 3D Card: sits high in upper-mid left area, moved further to the left
- * - Top anchor extends 10 units ABOVE the screen: lanyard top end is NEVER seen when stretching
- * - Dark green lanyard strap with NO text
- * - Draggable by both the lanyard strap AND the card
- * - Open animation: falls dramatically from above the top of the screen on load
- * - Auto-face front: card smoothly springs back to face front when released
+ * - Realistic Lanyard: Woven grosgrain fabric texture with MeshStandardMaterial lighting,
+ *   physical fabric catenary sag & wave inertia, metallic swivel clasp & crimp assembly
+ * - Continuous slow floating animation: card gently sways, bobs, and breathes in 3D space even when not stretched
+ * - Darker forest green lanyard with no text, top anchor positioned 10 units offscreen
  * - Hint pill badge positioned at the RIGHT side of the 3D card
+ * - Draggable by both card and lanyard, auto-returns to front on release
  */
 export default function LanyardCard3D({ className = "w-full h-full" }) {
   const mountRef = useRef(null);
@@ -46,7 +45,7 @@ export default function LanyardCard3D({ className = "w-full h-full" }) {
       return camera.position.y + visibleHeight / 2;
     };
 
-    // CRITICAL USER INSTRUCTION: "move the 3D card a little to the left."
+    // Calculate left-side resting position based on screen aspect ratio
     const getRestX = () => {
       const aspect = width / height;
       if (aspect > 1.3) {
@@ -58,22 +57,21 @@ export default function LanyardCard3D({ className = "w-full h-full" }) {
     };
 
     let restX = getRestX();
-    // Card sits comfortably in the upper-mid area (0.45), so at rest it DOES NOT reach bottom name
     const restY = 0.45;
 
-    // Lights
-    const ambientLight = new THREE.AmbientLight(0xffffff, 2.2);
+    // Lights - Carefully balanced for realistic fabric and card specular highlights
+    const ambientLight = new THREE.AmbientLight(0xffffff, 2.0);
     scene.add(ambientLight);
 
-    const keyLight = new THREE.DirectionalLight(0xffffff, 2.5);
+    const keyLight = new THREE.DirectionalLight(0xffffff, 2.6);
     keyLight.position.set(4, 7, 7);
     scene.add(keyLight);
 
-    const greenRim = new THREE.PointLight(0x22c55e, 3.5, 18);
+    const greenRim = new THREE.PointLight(0x22c55e, 3.8, 18);
     greenRim.position.set(-5, -1, 4);
     scene.add(greenRim);
 
-    const softFill = new THREE.PointLight(0xffffff, 1.2, 18);
+    const softFill = new THREE.PointLight(0xffffff, 1.4, 18);
     softFill.position.set(5, -3, 3);
     scene.add(softFill);
 
@@ -418,47 +416,91 @@ export default function LanyardCard3D({ className = "w-full h-full" }) {
     cardMeshBack.position.z = -0.01;
     cardGroup.add(cardMeshBack);
 
-    // Realistic Metallic Clip
-    const clipGeo = new THREE.CylinderGeometry(0.045, 0.045, 0.22, 16);
-    const clipMat = new THREE.MeshStandardMaterial({ color: 0x94a3b8, metalness: 0.9, roughness: 0.2 });
-    const clipMesh = new THREE.Mesh(clipGeo, clipMat);
-    clipMesh.rotation.z = Math.PI / 2;
-    clipMesh.position.set(0, cardH / 2 - 0.09, 0.02);
-    cardGroup.add(clipMesh);
+    // ==========================================
+    // 4. REALISTIC METALLIC SWIVEL CLASP ASSEMBLY
+    // ==========================================
+    const metalMat = new THREE.MeshStandardMaterial({
+      color: 0xc0c7d0,
+      metalness: 0.95,
+      roughness: 0.15
+    });
+
+    // 1. Horizontal clip bar passing through the card's slot hole
+    const slotClipGeo = new THREE.CylinderGeometry(0.04, 0.04, 0.22, 16);
+    const slotClipMesh = new THREE.Mesh(slotClipGeo, metalMat);
+    slotClipMesh.rotation.z = Math.PI / 2;
+    slotClipMesh.position.set(0, cardH / 2 - 0.09, 0.01);
+    cardGroup.add(slotClipMesh);
+
+    // 2. Vertical connector loop / swivel ring
+    const ringGeo = new THREE.TorusGeometry(0.08, 0.022, 12, 24);
+    const ringMesh = new THREE.Mesh(ringGeo, metalMat);
+    ringMesh.position.set(0, cardH / 2 + 0.03, 0.01);
+    cardGroup.add(ringMesh);
+
+    // 3. Metallic crimp clasp holding the bottom of the fabric ribbon
+    const crimpGeo = new THREE.BoxGeometry(0.38, 0.12, 0.07);
+    const crimpMesh = new THREE.Mesh(crimpGeo, metalMat);
+    crimpMesh.position.set(0, cardH / 2 + 0.14, 0.01);
+    cardGroup.add(crimpMesh);
 
     // ==========================================
-    // 4. LANYARD STRAP: DARK GREEN BACKGROUND, NO TEXT
+    // 5. REALISTIC WOVEN FABRIC LANYARD (MeshStandardMaterial + Micro-Weave Canvas)
     // ==========================================
     const lanyardCanvas = document.createElement('canvas');
-    lanyardCanvas.width = 128;
-    lanyardCanvas.height = 512;
+    lanyardCanvas.width = 256;
+    lanyardCanvas.height = 1024;
     const lCtx = lanyardCanvas.getContext('2d');
 
-    // CRITICAL USER INSTRUCTION: "change the color of the lanyard to a darker green."
-    lCtx.fillStyle = '#021809'; // Very deep, dark forest green
-    lCtx.fillRect(0, 0, 128, 512);
+    // Base deep dark forest green
+    lCtx.fillStyle = '#011508';
+    lCtx.fillRect(0, 0, 256, 1024);
 
-    // Subtle weave pattern
-    lCtx.fillStyle = '#031f0d';
-    lCtx.fillRect(8, 0, 112, 512);
+    // Procedural woven grosgrain fabric texture (alternating ribbed fabric weave lines)
+    for (let y = 0; y < 1024; y += 4) {
+      // Alternating fine fabric grain
+      if ((y / 4) % 2 === 0) {
+        lCtx.fillStyle = '#021e0b';
+      } else {
+        lCtx.fillStyle = '#011206';
+      }
+      lCtx.fillRect(12, y, 232, 4);
 
-    // Edge stitch lines in deep muted dark pine green
-    lCtx.strokeStyle = '#063318';
-    lCtx.lineWidth = 6;
-    lCtx.strokeRect(4, 0, 120, 512);
-    // (NO TEXT AT ALL on the lanyard)
+      // Micro weave grain dots
+      lCtx.fillStyle = '#032a10';
+      for (let x = 16; x < 240; x += 12) {
+        if ((x + y) % 8 === 0) {
+          lCtx.fillRect(x, y, 6, 2);
+        }
+      }
+    }
+
+    // Outer fabric reinforced stitched borders
+    lCtx.strokeStyle = '#053d19';
+    lCtx.lineWidth = 10;
+    lCtx.strokeRect(6, 0, 244, 1024);
+
+    // Inner subtle stitch dashed line
+    lCtx.strokeStyle = '#084f22';
+    lCtx.lineWidth = 3;
+    lCtx.setLineDash([8, 8]);
+    lCtx.strokeRect(18, 0, 220, 1024);
+    lCtx.setLineDash([]);
 
     const lanyardTexture = new THREE.CanvasTexture(lanyardCanvas);
     lanyardTexture.wrapS = THREE.RepeatWrapping;
     lanyardTexture.wrapT = THREE.RepeatWrapping;
-    lanyardTexture.repeat.set(1, 4);
+    lanyardTexture.repeat.set(1, 6);
 
-    const lanyardMaterial = new THREE.MeshBasicMaterial({
+    // MeshStandardMaterial gives the fabric authentic light diffusion and soft specular luster!
+    const lanyardMaterial = new THREE.MeshStandardMaterial({
       map: lanyardTexture,
+      roughness: 0.68,
+      metalness: 0.08,
       side: THREE.DoubleSide
     });
 
-    const strapSegments = 28;
+    const strapSegments = 32;
     const strapWidth = 0.36;
     const strapGeo = new THREE.PlaneGeometry(strapWidth, 1, 1, strapSegments);
     const strapMesh = new THREE.Mesh(strapGeo, lanyardMaterial);
@@ -470,20 +512,18 @@ export default function LanyardCard3D({ className = "w-full h-full" }) {
     const lanyardHitMesh = new THREE.Mesh(hitBoxGeo, hitBoxMat);
     scene.add(lanyardHitMesh);
 
-    // CRITICAL USER INSTRUCTION:
-    // "when stretching the 3D card, you can see the lanyard's end at the top. it shouldnt be seen, fix it."
-    // Set the anchor 10.0 units ABOVE the top of the visible screen!
-    // That way, the top end of the ribbon is ALWAYS far offscreen, so it is IMPOSSIBLE to ever see the end!
+    // CRITICAL: Anchor 10 units ABOVE visible top so lanyard end is NEVER seen when stretching
     let topAnchor = new THREE.Vector3(restX, getVisibleTop() + 10.0, 0);
 
-    // Function to keep lanyard 100% connected extending into deep offscreen space
-    const updateLanyardAttachment = () => {
-      const cardSlotLocal = new THREE.Vector3(0, cardH / 2 - 0.05, 0);
+    // Update lanyard attachment with physical fabric catenary sag & wave inertia
+    const updateLanyardAttachment = (time) => {
+      // Connect to top of crimp clasp
+      const cardSlotLocal = new THREE.Vector3(0, cardH / 2 + 0.18, 0.01);
       const cardSlotWorld = cardSlotLocal.clone();
       cardGroup.localToWorld(cardSlotWorld);
 
       topAnchor.x = restX;
-      topAnchor.y = getVisibleTop() + 10.0; // 10 units ABOVE screen top: NEVER SEEN!
+      topAnchor.y = getVisibleTop() + 10.0;
 
       const pos = strapGeo.attributes.position;
       const hitPos = hitBoxGeo.attributes.position;
@@ -491,12 +531,23 @@ export default function LanyardCard3D({ className = "w-full h-full" }) {
 
       const camPos = camera.position;
 
+      // Distance between card and anchor to compute realistic fabric slack
+      const dist = cardSlotWorld.distanceTo(topAnchor);
+
       for (let j = 0; j < totalRows; j++) {
         const t = j / strapSegments; // 0 = card, 1 = anchor
 
-        const curX = cardSlotWorld.x * (1 - t) + topAnchor.x * t;
+        // Arc factor: 0 at ends, 1 in the middle
+        const arc = Math.sin(t * Math.PI);
+
+        // Physical fabric wave & natural gravity catenary curve
+        const waveX = Math.sin(t * Math.PI * 2.0 + time * 1.4) * 0.02 * arc;
+        const waveZ = Math.cos(t * Math.PI * 1.5 + time * 1.1) * 0.025 * arc;
+        const sagZ = arc * Math.max(0, 0.06 * (1 - dist / 14.0));
+
+        const curX = cardSlotWorld.x * (1 - t) + topAnchor.x * t + waveX;
         const curY = cardSlotWorld.y * (1 - t) + topAnchor.y * t;
-        const curZ = cardSlotWorld.z * (1 - t) + topAnchor.z * t;
+        const curZ = cardSlotWorld.z * (1 - t) + topAnchor.z * t + waveZ - sagZ;
 
         const center = new THREE.Vector3(curX, curY, curZ);
         const toCam = new THREE.Vector3().subVectors(camPos, center).normalize();
@@ -527,7 +578,7 @@ export default function LanyardCard3D({ className = "w-full h-full" }) {
       lanyardHitMesh.position.set(0, 0, 0);
       lanyardHitMesh.rotation.set(0, 0, 0);
 
-      // Compute bounding spheres for reliable raycasting
+      strapGeo.computeVertexNormals();
       strapGeo.computeBoundingBox();
       strapGeo.computeBoundingSphere();
       hitBoxGeo.computeBoundingBox();
@@ -535,10 +586,10 @@ export default function LanyardCard3D({ className = "w-full h-full" }) {
     };
 
     // ==========================================
-    // 5. OPEN ANIMATION & PHYSICS
+    // 6. OPEN ANIMATION, CONTINUOUS SLOW FLOATING & PHYSICS
     // ==========================================
     let cardPos = { x: restX, y: getVisibleTop() + 8.0, z: 0 }; // Starts high above screen
-    let cardVelocity = { x: 0, y: -0.22, z: 0 }; // Fast downward plunge
+    let cardVelocity = { x: 0, y: -0.22, z: 0 }; // Fast downward plunge on initial load
     let cardRotation = { x: 0.15, y: 0.2, z: 0 };
     let rotVelocity = { x: 0, y: 0, z: 0 };
 
@@ -637,20 +688,32 @@ export default function LanyardCard3D({ className = "w-full h-full" }) {
     window.addEventListener('resize', onResize);
 
     // ==========================================
-    // 6. ANIMATION LOOP (Spring & Auto-Face Front)
+    // 7. ANIMATION LOOP (Slow Idle Motion + Auto-Face Front)
     // ==========================================
     let animId;
     let clock = new THREE.Clock();
 
     const animate = () => {
       animId = requestAnimationFrame(animate);
+      const time = clock.getElapsedTime();
 
       if (!isDragging) {
+        // CRITICAL USER INSTRUCTION: "the 3D card must be moving slowly for animation even when not stretched."
+        // Slow, natural organic floating & pendulum sway in 3D space:
+        const idleBobY = Math.sin(time * 1.3) * 0.045;   // Gentle slow floating bob up & down
+        const idleSwayX = Math.sin(time * 0.85) * 0.038; // Gentle subtle horizontal sway
+        const idleYaw = Math.sin(time * 1.05) * 0.075;   // Slow gentle yaw turning left/right (~4.3 degrees)
+        const idlePitch = Math.cos(time * 1.25) * 0.045; // Subtle slow nod up/down (~2.5 degrees)
+        const idleRoll = Math.sin(time * 0.85) * 0.03;   // Subtle pendulum roll tilt
+
+        const targetX = restX + idleSwayX;
+        const targetY = restY + idleBobY;
+
         const springK = 0.042;
         const damping = 0.88;
 
-        const forceX = (restX - cardPos.x) * springK;
-        const forceY = (restY - cardPos.y) * springK;
+        const forceX = (targetX - cardPos.x) * springK;
+        const forceY = (targetY - cardPos.y) * springK;
 
         cardVelocity.x = (cardVelocity.x + forceX) * damping;
         cardVelocity.y = (cardVelocity.y + forceY) * damping;
@@ -658,26 +721,23 @@ export default function LanyardCard3D({ className = "w-full h-full" }) {
         cardPos.x += cardVelocity.x;
         cardPos.y += cardVelocity.y;
 
-        const targetRotZ = -(cardPos.x - restX) * 0.18;
-        cardRotation.z += (targetRotZ - cardRotation.z) * 0.08;
+        // Auto-face front while gracefully blending in slow idle 3D breathing rotation
+        cardRotation.y += (idleYaw - cardRotation.y) * 0.08;
+        cardRotation.x += (idlePitch - cardRotation.x) * 0.08;
 
-        // Auto-face front on release
-        cardRotation.y += (0 - cardRotation.y) * 0.10;
-        cardRotation.x += (0 - cardRotation.x) * 0.10;
+        const dynamicRotZ = -(cardPos.x - restX) * 0.16 + idleRoll;
+        cardRotation.z += (dynamicRotZ - cardRotation.z) * 0.08;
 
         rotVelocity.y *= 0.82;
         rotVelocity.x *= 0.82;
-
-        const time = clock.getElapsedTime();
-        cardPos.y += Math.sin(time * 2.0) * 0.0015;
       }
 
       // Update card group transform
       cardGroup.position.set(cardPos.x, cardPos.y, cardPos.z);
       cardGroup.rotation.set(cardRotation.x, cardRotation.y, cardRotation.z);
 
-      // Update lanyard connection
-      updateLanyardAttachment();
+      // Update lanyard connection with time for realistic cloth ripples
+      updateLanyardAttachment(time);
 
       renderer.render(scene, camera);
     };
@@ -699,7 +759,9 @@ export default function LanyardCard3D({ className = "w-full h-full" }) {
       }
       renderer.dispose();
       cardGeo.dispose();
-      clipGeo.dispose();
+      slotClipGeo.dispose();
+      ringGeo.dispose();
+      crimpGeo.dispose();
       strapGeo.dispose();
       hitBoxGeo.dispose();
       textureFront.dispose();
@@ -711,7 +773,6 @@ export default function LanyardCard3D({ className = "w-full h-full" }) {
   return (
     <div className={`relative select-none ${className}`}>
       <div ref={mountRef} className="w-full h-full cursor-grab active:cursor-grabbing" />
-      {/* CRITICAL USER INSTRUCTION: "put this at the right side of the 3D card." */}
       {hintVisible && (
         <div className="absolute top-[38%] left-1/2 md:left-[30%] lg:left-[27%] -translate-y-1/2 -translate-x-1/2 md:translate-x-0 px-4 py-2 rounded-full bg-black/90 backdrop-blur-md border border-green-500/50 text-[11px] font-mono text-green-400 pointer-events-none whitespace-nowrap shadow-[0_0_20px_rgba(34,197,94,0.25)] flex items-center gap-2 animate-bounce z-30">
           <span>✦ Drag Card or Lanyard to Stretch • 360° Spin (Returns Front)</span>
