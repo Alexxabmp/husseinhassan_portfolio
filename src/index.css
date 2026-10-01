@@ -1,0 +1,47 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    background-color: #000000;
+  }
+
+  body {
+    background-color: #000000;
+    color: #e2e8f0;
+    font-family: 'Geist Mono', monospace;
+    overflow-x: hidden;
+  }
+
+  /* Custom Sleek Scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #000000;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #1e293b;
+    border-radius: 9999px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #22c55e;
+  }
+}
+
+/* Massive display typography for HUSSEIN HASSAN matching Arlen Carter */
+.hero-giant-title {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  line-height: 0.9;
+}
