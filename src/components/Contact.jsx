@@ -11,9 +11,9 @@ export default function Contact() {
     pms: 'Dentrix',
     message: ''
   });
+  const [mailUrls, setMailUrls] = useState({ gmailUrl: '', mailtoUrl: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
-  const [errorMsg, setErrorMsg] = useState('');
   const [inView, setInView] = useState(false);
   const sectionRef = useRef(null);
 
@@ -42,47 +42,24 @@ export default function Contact() {
     setTimeout(() => setCopiedItem(null), 2500);
   };
 
-  const handleSubmit = async (e) => {
+  // Option 1: 1-Click "Open in Gmail Web" (100% Reliable, Zero Setup, Opens directly to Hussein)
+  const handleSubmit = (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    setErrorMsg('');
 
-    try {
-      // Send directly to Hussein's Gmail via FormSubmit AJAX API
-      const response = await fetch('https://formsubmit.co/ajax/vinzhassan0114@gmail.com', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        body: JSON.stringify({
-          _subject: `New Dental Practice Inquiry from ${formState.name} (${formState.practice})`,
-          name: formState.name,
-          email: formState.email,
-          practiceLocation: formState.practice,
-          pmsSoftware: formState.pms,
-          message: formState.message,
-          _template: 'table'
-        })
-      });
+    const subject = `Dental Billing Inquiry from ${formState.name} (${formState.practice})`;
+    const body = `Dear Hussein,\n\nMy name is ${formState.name} from ${formState.practice}.\nPrimary PMS Software: ${formState.pms}\nPractice Email: ${formState.email}\n\nPractice Requirements / Inquiry:\n${formState.message}\n\nLooking forward to your response.\n\nBest regards,\n${formState.name}`;
 
-      if (response.ok) {
-        setSubmitted(true);
-        setFormState({ name: '', email: '', practice: '', pms: 'Dentrix', message: '' });
-      } else {
-        throw new Error('Network response not ok');
-      }
-    } catch (err) {
-      // Fallback: Open mail client if network request fails
-      const subject = encodeURIComponent(`Dental Billing Inquiry from ${formState.name} (${formState.practice})`);
-      const body = encodeURIComponent(
-        `Hello Hussein,\n\nName: ${formState.name}\nPractice: ${formState.practice}\nPMS System: ${formState.pms}\nEmail: ${formState.email}\n\nMessage:\n${formState.message}`
-      );
-      window.open(`mailto:${personalData.email}?subject=${subject}&body=${body}`, '_blank');
-      setSubmitted(true);
-    } finally {
-      setIsSubmitting(false);
-    }
+    const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(personalData.email)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    const mailtoUrl = `mailto:${encodeURIComponent(personalData.email)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+
+    setMailUrls({ gmailUrl, mailtoUrl });
+
+    // Open Gmail directly in new window / tab
+    window.open(gmailUrl, '_blank');
+
+    setSubmitted(true);
+    setIsSubmitting(false);
   };
 
   return (
@@ -191,19 +168,44 @@ export default function Contact() {
               </div>
 
               {submitted ? (
-                <div className="py-10 text-center space-y-3">
-                  <div className="w-12 h-12 rounded-full bg-green-500/10 border border-green-500/30 text-green-400 flex items-center justify-center mx-auto">
+                <div className="py-8 text-center space-y-4">
+                  <div className="w-12 h-12 rounded-full bg-green-500/10 border border-green-500/30 text-green-400 flex items-center justify-center mx-auto shadow-[0_0_15px_rgba(34,197,94,0.3)]">
                     <Check size={24} />
                   </div>
-                  <h4 className="text-base font-bold text-white uppercase">MESSAGE SENT SUCCESSFULLY</h4>
-                  <p className="text-xs text-gray-400 max-w-sm mx-auto">
-                    Your message has been delivered directly to <span className="text-green-400 font-semibold">{personalData.email}</span>. Hussein will reply promptly.
-                  </p>
+                  <div>
+                    <h4 className="text-base font-bold text-white uppercase tracking-tight">GMAIL DRAFT OPENED</h4>
+                    <p className="text-xs text-gray-400 max-w-md mx-auto mt-1 leading-relaxed">
+                      A new tab has opened in <span className="text-white font-semibold">Gmail</span> pre-filled with your message to <span className="text-green-400 font-semibold">{personalData.email}</span>. Simply click <span className="text-white font-bold">"Send"</span>!
+                    </p>
+                  </div>
+
+                  {/* Fallback Direct Action Links */}
+                  <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-2.5 max-w-sm mx-auto">
+                    <a
+                      href={mailUrls.gmailUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-full sm:w-auto px-4 py-2.5 rounded bg-white text-black font-bold uppercase text-[11px] tracking-wider hover:bg-gray-200 transition-all flex items-center justify-center gap-1.5 shadow"
+                    >
+                      <Send size={12} />
+                      <span>Open in Gmail Web</span>
+                    </a>
+                    <a
+                      href={mailUrls.mailtoUrl}
+                      className="w-full sm:w-auto px-4 py-2.5 rounded bg-white/[0.05] border border-white/10 hover:border-white/25 text-white font-bold uppercase text-[11px] tracking-wider transition-all flex items-center justify-center gap-1.5"
+                    >
+                      <span>Default Mail App</span>
+                    </a>
+                  </div>
+
                   <button
-                    onClick={() => setSubmitted(false)}
-                    className="text-xs text-green-400 hover:underline pt-3 uppercase block mx-auto font-bold"
+                    onClick={() => {
+                      setSubmitted(false);
+                      setFormState({ name: '', email: '', practice: '', pms: 'Dentrix', message: '' });
+                    }}
+                    className="text-xs text-green-400 hover:underline pt-2 uppercase block mx-auto font-bold"
                   >
-                    ← Send Another Message
+                    ← Write Another Message
                   </button>
                 </div>
               ) : (
@@ -291,18 +293,12 @@ export default function Contact() {
                     disabled={isSubmitting}
                     className="w-full py-3 rounded bg-white text-black hover:bg-gray-200 disabled:opacity-50 font-bold uppercase tracking-wider text-xs transition-all flex items-center justify-center gap-2 shadow-md mt-2 cursor-pointer hover:scale-[1.01] active:scale-[0.99]"
                   >
-                    {isSubmitting ? (
-                      <>
-                        <Loader2 size={13} className="animate-spin text-black" />
-                        <span>TRANSMITTING DIRECTLY TO HUSSEIN...</span>
-                      </>
-                    ) : (
-                      <>
-                        <Send size={13} />
-                        <span>SEND MESSAGE TO GMAIL</span>
-                      </>
-                    )}
+                    <Send size={13} />
+                    <span>OPEN PRE-FILLED IN GMAIL</span>
                   </button>
+                  <p className="text-[10px] text-gray-500 text-center mt-2 font-normal">
+                    * Opens pre-filled inquiry directly in Gmail addressed to <span className="text-gray-300 font-semibold">{personalData.email}</span>.
+                  </p>
                 </form>
               )}
 
